@@ -30,21 +30,27 @@
   (amount uint)
   (recipient principal)
 )
-  (let ((proposal-id (+ (var-get proposal-count) u1)))
-    (map-set proposals
-      { id: proposal-id }
-      {
-        title: title,
-        description: description,
-        amount: amount,
-        recipient: recipient,
-        votes-for: u0,
-        votes-against: u0,
-        status: "active",
-        proposer: tx-sender
-      }
+  (begin
+    (asserts! (> (len title) u0) (err u400))
+    (asserts! (> (len description) u0) (err u400))
+    (asserts! (> amount u0) (err u400))
+    (let ((proposal-id (+ (var-get proposal-count) u1)))
+      (var-set proposal-count proposal-id)
+      (map-set proposals
+        { id: proposal-id }
+        {
+          title: title,
+          description: description,
+          amount: amount,
+          recipient: recipient,
+          votes-for: u0,
+          votes-against: u0,
+          status: "active",
+          proposer: tx-sender
+        }
+      )
+      (ok proposal-id)
     )
-    (ok proposal-id)
   )
 )
 
@@ -52,6 +58,7 @@
   (let ((voter-balance (unwrap! (contract-call? .dao-token get-balance tx-sender) (err u401))))
     (if (> voter-balance u0)
       (let ((proposal (unwrap! (map-get? proposals {id: proposal-id}) (err u404))))
+        (asserts! (is-eq (get status proposal) "active") (err u403))
         (if support
           (map-set proposals 
             {id: proposal-id}

@@ -4,7 +4,7 @@ A decentralized autonomous organization (DAO) for managing impact-driven project
 
 ## Features
 - Membership management with governance tokens
-- Project proposal and voting system
+- Project proposal and voting system with input validation
 - Fund allocation and distribution
 - Impact reporting and tracking
 
@@ -19,8 +19,8 @@ A decentralized autonomous organization (DAO) for managing impact-driven project
 - leave-dao: Leave the DAO and burn governance tokens
 
 ### Governance
-- submit-proposal: Submit a new project proposal
-- vote: Vote on active proposals
+- submit-proposal: Submit a new project proposal (requires valid title, description, and amount)
+- vote: Vote on active proposals (restricted to token holders)
 - execute-proposal: Execute approved proposals
 
 ### Treasury
@@ -30,3 +30,10 @@ A decentralized autonomous organization (DAO) for managing impact-driven project
 ### Impact Tracking
 - report-impact: Submit impact metrics for funded projects
 - get-impact-metrics: Retrieve impact data for projects
+
+## Input Validation
+The contract now includes validation for proposal submissions:
+- Title must not be empty
+- Description must not be empty
+- Amount must be greater than 0
+- Only active proposals can receive votes
