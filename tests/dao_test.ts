@@ -8,7 +8,7 @@ import {
 import { assertEquals } from 'https://deno.land/std@0.90.0/testing/asserts.ts';
 
 Clarinet.test({
-  name: "Ensure users can submit proposals",
+  name: "Ensure users can submit valid proposals",
   async fn(chain: Chain, accounts: Map<string, Account>) {
     const wallet_1 = accounts.get("wallet_1")!;
     
@@ -24,6 +24,25 @@ Clarinet.test({
     assertEquals(block.receipts.length, 1);
     assertEquals(block.height, 2);
     block.receipts[0].result.expectOk().expectUint(1);
+  },
+});
+
+Clarinet.test({
+  name: "Ensure invalid proposals are rejected",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const wallet_1 = accounts.get("wallet_1")!;
+    
+    let block = chain.mineBlock([
+      Tx.contractCall("impact-dao", "submit-proposal", [
+        types.ascii(""),
+        types.utf8("Description"),
+        types.uint(0),
+        types.principal(wallet_1.address)
+      ], wallet_1.address)
+    ]);
+    
+    assertEquals(block.receipts.length, 1);
+    block.receipts[0].result.expectErr().expectUint(400);
   },
 });
 
